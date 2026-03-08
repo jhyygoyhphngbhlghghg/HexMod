@@ -3,7 +3,6 @@
   "category": "hexcasting:items",
   "icon": "hexcasting:spellbook",
   "sortnum": 3,
-  "advancement": "hexcasting:root",
   "pages": [
     {
       "type": "patchouli:text",

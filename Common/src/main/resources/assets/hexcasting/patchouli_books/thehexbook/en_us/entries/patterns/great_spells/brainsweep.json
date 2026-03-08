@@ -3,7 +3,6 @@
   "category": "hexcasting:patterns/great_spells",
   "icon": "minecraft:skeleton_skull",
   "sortnum": 7,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

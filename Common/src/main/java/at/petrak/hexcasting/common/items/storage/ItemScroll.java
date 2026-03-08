@@ -118,14 +118,14 @@ public class ItemScroll extends Item implements IotaHolderItem {
         var scrollEntity = new EntityWallScroll(level, posInFront, direction, scrollStack, false, this.blockSize);
 
         if (scrollEntity.survives()) {
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 scrollEntity.playPlacementSound();
                 level.gameEvent(player, GameEvent.ENTITY_PLACE, posClicked);
                 level.addFreshEntity(scrollEntity);
             }
 
             itemstack.shrink(1);
-            return InteractionResult.sidedSuccess(level.isClientSide);
+            return InteractionResult.sidedSuccess(level.isClientSide());
         } else {
             return InteractionResult.CONSUME;
         }

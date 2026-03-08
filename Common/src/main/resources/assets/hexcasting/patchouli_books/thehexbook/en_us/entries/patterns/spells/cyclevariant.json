@@ -3,7 +3,6 @@
   "category": "hexcasting:patterns/spells",
   "icon": "minecraft:smithing_table",
   "sortnum": 6,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

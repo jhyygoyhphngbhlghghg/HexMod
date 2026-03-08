@@ -44,6 +44,7 @@ test {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     def buildProps = project.properties.clone()
 
     filesMatching(['pack.mcmeta']) {
@@ -55,6 +56,7 @@ processResources {
 // Inline interop is excluded so the mod compiles without the Inline dependency.
 sourceSets {
     main {
+        resources.srcDirs += 'src/generated/resources'
         java {
             exclude 'at/petrak/hexcasting/datagen/**'
             exclude 'at/petrak/hexcasting/interop/inline/**'

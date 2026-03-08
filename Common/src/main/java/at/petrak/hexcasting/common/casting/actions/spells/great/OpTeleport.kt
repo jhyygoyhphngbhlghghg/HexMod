@@ -77,7 +77,7 @@ object OpTeleport : SpellAction {
                 // Armor and hotbar items have a further reduced chance to be dropped since it's particularly annoying
                 // having to rearrange those. Also it makes sense for LORE REASONS probably, since the caster is more
                 // aware of items they use often.
-                for (armorItem in teleportee.inventory.armor) {
+                for (armorItem in teleportee.getInventory().armor) {
                     if (EnchantmentHelper.hasTag(armorItem, EnchantmentTags.CURSE))
                         continue
 
@@ -87,7 +87,7 @@ object OpTeleport : SpellAction {
                     }
                 }
 
-                for ((pos, invItem) in teleportee.inventory.items.withIndex()) {
+                for ((pos, invItem) in teleportee.getInventory().items.withIndex()) {
                     if (invItem == teleportee.mainHandItem) continue
                     val dropChance = if (pos < 9) baseDropChance * 0.5 else baseDropChance // hotbar
                     if (Math.random() < dropChance) {

@@ -118,7 +118,7 @@ public abstract class ItemPackagedHex extends ItemMediaHolder implements HexHold
             return InteractionResultHolder.fail(stack);
         }
 
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return InteractionResultHolder.success(stack);
         }
 

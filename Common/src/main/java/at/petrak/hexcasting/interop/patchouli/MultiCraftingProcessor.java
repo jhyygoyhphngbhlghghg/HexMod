@@ -36,7 +36,7 @@ public class MultiCraftingProcessor implements IComponentProcessor {
         List<String> names = vars.get("recipes", provider).asStream(provider).map(IVariable::asString).collect(Collectors.toList());
         this.recipes = new ArrayList<>();
         for (String name : names) {
-            CraftingRecipe recipe = PatchouliUtils.getRecipe(RecipeType.CRAFTING, ResourceLocation.parse(name));
+            CraftingRecipe recipe = PatchouliUtils.getRecipe(level, RecipeType.CRAFTING, ResourceLocation.parse(name));
             if (recipe != null) {
                 recipes.add(recipe);
                 if (shapeless) {

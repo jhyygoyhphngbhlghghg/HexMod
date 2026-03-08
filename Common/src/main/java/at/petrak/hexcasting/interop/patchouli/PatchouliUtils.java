@@ -6,7 +6,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.Level;
 import vazkii.patchouli.api.IVariable;
 
 import java.util.ArrayList;
@@ -21,18 +24,40 @@ import java.util.stream.Collectors;
  * -- Hubry Vazcord
  */
 public class PatchouliUtils {
+    /** Uses current client level. Prefer {@link #getRecipe(Level, RecipeType, ResourceLocation)} when a level is available (e.g. from Patchouli). */
     @SuppressWarnings("unchecked")
     public static <T extends Recipe<?>> T getRecipe(RecipeType<T> type, ResourceLocation id) {
-        // PageDoubleRecipeRegistry
-        if (Minecraft.getInstance().level == null) {
-            return null;
-        } else {
-            var manager = Minecraft.getInstance().level.getRecipeManager();
-            return (T) manager.byKey(id)
-                .filter((holder) -> holder.value().getType() == type)
-                .map(h -> (T) h.value())
-                .orElse(null);
+        Level level = Minecraft.getInstance().level;
+        return level == null ? null : getRecipe(level, type, id);
+    }
+
+    /** Prefer server recipe manager when level has one (singleplayer); fallback to level's manager and to getAllRecipesFor lookup. */
+    @SuppressWarnings("unchecked")
+    public static <T extends Recipe<?>> T getRecipe(Level level, RecipeType<T> type, ResourceLocation id) {
+        if (level == null) return null;
+        RecipeManager manager = (level.getServer() != null) ? level.getServer().getRecipeManager() : level.getRecipeManager();
+        T recipe = getRecipeFromManager(type, id, manager);
+        if (recipe == null && level.getServer() != null) {
+            recipe = getRecipeFromManager(type, id, level.getRecipeManager());
         }
+        return recipe;
+    }
+
+    /** Look up recipe by id; tries byKey then getAllRecipesFor+filter in case registry keying differs. */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private static <T extends Recipe<?>> T getRecipeFromManager(RecipeType<T> type, ResourceLocation id, RecipeManager manager) {
+        T recipe = (T) manager.byKey(id)
+            .filter((holder) -> holder.value().getType() == type)
+            .map(h -> (T) h.value())
+            .orElse(null);
+        if (recipe == null) {
+            for (RecipeHolder<?> h : (List<RecipeHolder<?>>) (List<?>) manager.getAllRecipesFor((RecipeType) type)) {
+                if (h.id().equals(id) && h.value().getType() == type) {
+                    return (T) h.value();
+                }
+            }
+        }
+        return recipe;
     }
 
     /**

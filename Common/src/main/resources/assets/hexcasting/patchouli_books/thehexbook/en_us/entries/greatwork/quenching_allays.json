@@ -2,7 +2,6 @@
   "name": "hexcasting.entry.quenching_allays",
   "category": "hexcasting:greatwork",
   "icon": "hexcasting:quenched_allay",
-  "advancement": "hexcasting:enlightenment",
   "entry_color": "54398a",
   "sortnum": 5,
   "pages": [

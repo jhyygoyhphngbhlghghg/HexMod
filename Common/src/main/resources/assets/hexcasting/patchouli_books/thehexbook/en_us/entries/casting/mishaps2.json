@@ -3,7 +3,6 @@
   "category": "hexcasting:casting",
   "icon": "minecraft:flint_and_steel",
   "sortnum": 3,
-  "advancement": "hexcasting:enlightenment",
   "entry_color": "54398a",
   "pages": [
     {

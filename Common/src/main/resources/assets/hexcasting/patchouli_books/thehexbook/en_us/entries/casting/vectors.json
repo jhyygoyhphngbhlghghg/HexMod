@@ -4,7 +4,6 @@
   "icon": "minecraft:arrow",
   "priority": true,
   "sortnum": 1,
-  "advancement": "hexcasting:root",
   "pages": [
     {
       "type": "patchouli:link",

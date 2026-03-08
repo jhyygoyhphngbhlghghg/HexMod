@@ -159,7 +159,7 @@ public abstract class BlockEntityAbstractImpetus extends HexBlockEntity implemen
     public void startExecution(@Nullable ServerPlayer player) {
         if (this.level == null)
             return; // TODO: error here?
-        if (this.level.isClientSide)
+        if (this.level.isClientSide())
             return; // TODO: error here?
 
         if (this.executionState != null) {

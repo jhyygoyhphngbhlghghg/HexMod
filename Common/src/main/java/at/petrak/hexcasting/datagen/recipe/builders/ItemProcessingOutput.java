@@ -12,7 +12,7 @@ public record ItemProcessingOutput(ItemStack stack, float chance) implements Pro
     public JsonObject serialize() {
         JsonObject json = new JsonObject();
         ResourceLocation resourceLocation = BuiltInRegistries.ITEM.getKey(stack.getItem());
-        json.addProperty("item", resourceLocation.toString());
+        json.addProperty("id", resourceLocation.toString());
         int count = stack.getCount();
         if (count != 1) {
             json.addProperty("count", count);

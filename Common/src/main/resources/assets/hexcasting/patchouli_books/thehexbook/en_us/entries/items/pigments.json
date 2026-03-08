@@ -3,7 +3,6 @@
   "category": "hexcasting:items",
   "icon": "hexcasting:uuid_colorizer",
   "sortnum": 8,
-  "advancement": "hexcasting:root",
   "pages": [
     "hexcasting.page.pigments.1",
     "hexcasting.page.pigments.2",

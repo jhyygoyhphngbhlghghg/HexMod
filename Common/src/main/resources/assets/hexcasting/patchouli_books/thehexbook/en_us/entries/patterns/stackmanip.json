@@ -3,7 +3,6 @@
   "category": "hexcasting:patterns",
   "icon": "minecraft:piston",
   "sortnum": 4,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

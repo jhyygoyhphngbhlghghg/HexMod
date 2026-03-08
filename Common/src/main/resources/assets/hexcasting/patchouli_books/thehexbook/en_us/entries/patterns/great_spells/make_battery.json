@@ -3,7 +3,6 @@
   "category": "hexcasting:patterns/great_spells",
   "icon": "hexcasting:battery",
   "sortnum": 6,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

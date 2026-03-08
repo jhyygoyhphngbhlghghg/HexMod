@@ -3,7 +3,6 @@
   "category": "hexcasting:items",
   "icon": "hexcasting:battery",
   "sortnum": 7,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

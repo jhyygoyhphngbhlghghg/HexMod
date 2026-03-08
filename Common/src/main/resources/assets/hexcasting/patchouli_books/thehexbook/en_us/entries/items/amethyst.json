@@ -4,7 +4,6 @@
   "category": "hexcasting:items",
   "priority": true,
   "sortnum": 0,
-  "advancement": "hexcasting:root",
   "pages": [
     {
       "type": "patchouli:spotlight",

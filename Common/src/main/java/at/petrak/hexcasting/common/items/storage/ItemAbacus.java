@@ -63,7 +63,7 @@ public class ItemAbacus extends Item implements IotaHolderItem {
             }
             player.displayClientMessage(Component.translatable(key), true);
 
-            return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+            return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
         } else {
             return InteractionResultHolder.pass(stack);
         }

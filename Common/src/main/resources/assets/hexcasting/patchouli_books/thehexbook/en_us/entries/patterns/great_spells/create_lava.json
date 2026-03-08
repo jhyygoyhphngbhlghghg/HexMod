@@ -3,7 +3,6 @@
   "category": "hexcasting:patterns/great_spells",
   "icon": "minecraft:lava_bucket",
   "sortnum": 0,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

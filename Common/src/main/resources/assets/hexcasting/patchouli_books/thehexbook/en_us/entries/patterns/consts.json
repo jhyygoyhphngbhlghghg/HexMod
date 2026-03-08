@@ -3,7 +3,6 @@
   "category": "hexcasting:patterns",
   "icon": "minecraft:bedrock",
   "sortnum": 3,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

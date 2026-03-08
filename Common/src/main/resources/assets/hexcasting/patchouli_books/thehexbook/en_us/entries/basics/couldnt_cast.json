@@ -3,7 +3,6 @@
   "category": "hexcasting:basics",
   "icon": "minecraft:textures/mob_effect/nausea.png",
   "sortnum": 0,
-  "advancement": "hexcasting:y_u_no_cast_angy",
   "pages": [
     {
       "type": "patchouli:text",

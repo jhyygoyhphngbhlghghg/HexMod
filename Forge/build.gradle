@@ -16,7 +16,7 @@ pkSubproj {
     modrinthJar = jar.archiveFile
     modrinthDependencies([
         "paucal:HyBiJPtT",
-        "patchouli:1.20.1-80-forge",
+        "patchouli:1.21.1-92-neoforge",
         "caelus:3.1.0+1.20",
     ])
 }
@@ -66,6 +66,81 @@ dependencies {
 }
 
 def commonMain = project(":Common").sourceSets.main
+def commonProcessResources = project(":Common").tasks.named('processResources')
+
+// Minecraft 1.21.1 datapack registry paths are singular (recipe, advancement, loot_table, tags/item, ...).
+// Our sources are still mostly on legacy plural paths from older versions.
+def remapDatapackPathFor1211 = { String path ->
+    if (!path.startsWith('data/')) {
+        return path
+    }
+    return path
+        .replace('/recipes/', '/recipe/')
+        .replace('/advancements/', '/advancement/')
+        .replace('/loot_tables/', '/loot_table/')
+        .replace('/item_modifiers/', '/item_modifier/')
+        .replace('/tags/blocks/', '/tags/block/')
+        .replace('/tags/items/', '/tags/item/')
+        .replace('/tags/entity_types/', '/tags/entity_type/')
+        .replace('/tags/fluids/', '/tags/fluid/')
+        .replace('/tags/game_events/', '/tags/game_event/')
+}
+
+// Copy Forge-generated data (recipes, etc.) into Common's generated resources so the mod's
+// Common output (on the dev run classpath) contains them and the game loads the recipes.
+tasks.register('copyForgeDataToCommon', Copy) {
+    from file('src/generated/resources/data')
+    into project(":Common").file('src/generated/resources/data')
+    includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+project(":Common").tasks.named('processResources').configure { dependsOn tasks.named('copyForgeDataToCommon') }
+// Forge processResources reads Common's generated resources (source dir), so it must run after the copy.
+tasks.named('processResources').configure { dependsOn tasks.named('copyForgeDataToCommon') }
+
+// Ensure dev run sees recipes/loot tables: copy all mod resources into build/resources/main
+// (NeoForge ModDev run uses this dir; processResources may output elsewhere.)
+tasks.register('copyModResourcesForRun', Copy) {
+    from file('src/main/resources')
+    from file('src/generated/resources')
+    from project(":Common").file('src/main/resources')
+    from project(":Common").file('src/generated/resources')
+    into layout.buildDirectory.dir('resources/main')
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    includeEmptyDirs = false
+    // Keep mod resources in the shared NeoForge mod data pack. A root pack.mcmeta can
+    // cause this module's data to be treated as a separate/incompatible data pack.
+    exclude 'pack.mcmeta'
+    eachFile { details ->
+        details.path = remapDatapackPathFor1211(details.path)
+    }
+    doFirst {
+        delete layout.buildDirectory.file('resources/main/pack.mcmeta')
+    }
+}
+tasks.named('copyModResourcesForRun').configure {
+    dependsOn tasks.named('copyForgeDataToCommon')
+    mustRunAfter tasks.named('processResources')
+}
+
+// NeoForge dev run loads the mod from build/classes/java/main only, so that root has no data/.
+// Copy resources into the classes output so the single mod root has both code and recipes/assets.
+// Use Copy (not Sync) so we don't remove the compiled .class files.
+tasks.register('syncResourcesIntoClasses', Copy) {
+    from layout.buildDirectory.dir('resources/main')
+    into layout.buildDirectory.dir('classes/java/main')
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    includeEmptyDirs = false
+    doFirst {
+        delete layout.buildDirectory.file('classes/java/main/pack.mcmeta')
+    }
+}
+tasks.named('syncResourcesIntoClasses').configure {
+    dependsOn tasks.named('processResources')
+    dependsOn tasks.named('copyModResourcesForRun')
+}
+tasks.named('compileJava').configure { finalizedBy tasks.named('syncResourcesIntoClasses') }
+tasks.named('compileKotlin').configure { finalizedBy tasks.named('syncResourcesIntoClasses') }
 
 neoForge {
     version = project.neoforgeVersion
@@ -75,11 +150,19 @@ neoForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', modID
+            taskBefore tasks.named('copyForgeDataToCommon')
+            taskBefore commonProcessResources
+            taskBefore tasks.named('copyModResourcesForRun')
+            taskBefore tasks.named('syncResourcesIntoClasses')
         }
         server {
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', modID
+            taskBefore tasks.named('copyForgeDataToCommon')
+            taskBefore commonProcessResources
+            taskBefore tasks.named('copyModResourcesForRun')
+            taskBefore tasks.named('syncResourcesIntoClasses')
         }
         data {
             data()
@@ -94,6 +177,10 @@ neoForge {
             data()
             programArguments.addAll '--mod', modID, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
             systemProperty 'hexcasting.forge_datagen', 'true'
+            taskBefore tasks.named('copyForgeDataToCommon')
+            taskBefore commonProcessResources
+            taskBefore tasks.named('copyModResourcesForRun')
+            taskBefore tasks.named('syncResourcesIntoClasses')
         }
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
@@ -107,6 +194,82 @@ neoForge {
             sourceSet commonMain
         }
     }
+}
+
+// Run tasks use build/classes and build/resources; declare dependency so Gradle validates order.
+tasks.named('runForgeDatagen').configure { dependsOn tasks.named('syncResourcesIntoClasses') }
+// Explicitly copy staff (and all) recipe data into the mod root so runClient always sees them.
+tasks.register('copyRecipesIntoModRoot', Copy) {
+    from file('src/main/resources/data/hexcasting/recipes')
+    into layout.buildDirectory.dir('classes/java/main/data/hexcasting/recipe')
+    includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+// Recipe-pack JAR deployed to run/mods so the game always loads staff (and all) recipes.
+// Fixes "Missing crafting recipe hexcasting:staff/oak" when dev classpath misses them.
+def recipePackDir = layout.buildDirectory.dir('recipePack')
+def recipePackMetaDir = layout.buildDirectory.dir('recipePackMeta')
+tasks.register('prepareRecipePack', Copy) {
+    from(file('src/main/resources/data/hexcasting/recipes')) { into 'data/hexcasting/recipe' }
+    into recipePackDir
+    includeEmptyDirs = false
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+tasks.register('writeRecipePackModsToml') {
+    outputs.dir(layout.buildDirectory.dir('recipePackMeta'))
+    doLast {
+        def dir = layout.buildDirectory.dir('recipePackMeta').get().file('META-INF').asFile
+        dir.mkdirs()
+        new File(dir, 'neoforge.mods.toml').text = """modLoader = "javafml"
+loaderVersion = "[4,)"
+
+[[mods]]
+modId = "hexcasting_dev_recipes"
+version = "1.0"
+displayName = "Hex Casting Dev Recipes"
+description = "Ensures recipes load in dev."
+
+[[dependencies.hexcasting_dev_recipes]]
+modId = "neoforge"
+mandatory = true
+versionRange = "[21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.hexcasting_dev_recipes]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"
+"""
+    }
+}
+tasks.register('createRecipePackMod', Zip) {
+    archiveFileName = 'hexcasting-dev-recipes.jar'
+    destinationDirectory = file('run/mods')
+    from(recipePackDir)
+    from(layout.buildDirectory.dir('recipePackMeta'))
+    dependsOn tasks.named('prepareRecipePack'), tasks.named('writeRecipePackModsToml')
+}
+tasks.named('runClient').configure {
+    dependsOn tasks.named('syncResourcesIntoClasses')
+    dependsOn project(":Common").tasks.named('processResources')
+    dependsOn tasks.named('copyRecipesIntoModRoot')
+    dependsOn tasks.named('createRecipePackMod')
+}
+tasks.named('copyRecipesIntoModRoot').configure { mustRunAfter tasks.named('syncResourcesIntoClasses') }
+
+// Ensure the built JAR contains recipes (and all mod data) for regular game and server use.
+// ModDev may pack from source sets or outputs that omit merged resources; explicitly add
+// the merged resource dir so the published JAR always has data/hexcasting/recipes etc.
+// Exclude pack.mcmeta so NeoForge treats this mod as part of the grouped "Mod Data" pack;
+// an explicit pack.mcmeta can make the mod a separate data pack and break recipe loading.
+tasks.named('jar').configure {
+    dependsOn tasks.named('syncResourcesIntoClasses')
+    dependsOn tasks.named('copyModResourcesForRun')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude 'pack.mcmeta'
 }
 
 compileJava {
@@ -128,6 +291,9 @@ sourceSets {
 
 processResources {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    exclude 'pack.mcmeta'
+    // Explicitly include all resource dirs so generated data is in build (and dev run)
+    from sourceSets.main.resources
     from project(":Common").sourceSets.main.resources
     inputs.property "version", project.version
     filesMatching("mods.toml") {

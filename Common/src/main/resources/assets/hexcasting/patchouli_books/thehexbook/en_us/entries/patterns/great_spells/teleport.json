@@ -3,7 +3,6 @@
   "category": "hexcasting:patterns/great_spells",
   "icon": "minecraft:ender_pearl",
   "sortnum": 3,
-  "advancement": "hexcasting:root",
   "read_by_default": true,
   "pages": [
     {

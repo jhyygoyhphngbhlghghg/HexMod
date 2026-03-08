@@ -1,6 +1,6 @@
 package at.petrak.hexcasting.forge.mixin;
 
-import at.petrak.hexcasting.forge.mixin.TagsProviderEFHSetter;
+import at.petrak.hexcasting.forge.TagsProviderEFHSetter;
 import net.minecraft.data.tags.TagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.objectweb.asm.Opcodes;

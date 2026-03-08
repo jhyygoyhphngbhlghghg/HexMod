@@ -6,7 +6,7 @@ public record CompatProcessingOutput(String name, int count, float chance) imple
     @Override
     public JsonObject serialize() {
         JsonObject json = new JsonObject();
-        json.addProperty("item", name);
+        json.addProperty("id", name);
         if (count != 1) {
             json.addProperty("count", count);
         }

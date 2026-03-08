@@ -132,3 +132,110 @@ tasks.register("runAllDatagen") {
     dependsOn ":Forge:runForgeDatagen"
     // dependsOn ":Fabric:runDatagen"  // Re-enable when Fabric is included
 }
+
+// Collect the built mod and all runtime dependency JARs into a folder for server/client modpack
+tasks.register("collectModpack", Copy) {
+    group = "distribution"
+    description = "Collect Hex Casting mod JAR and all dependency JARs into modpack/ for server or client modpack"
+    dependsOn ":Forge:jar"
+
+    def forgeProject = project(":Forge")
+
+    from(forgeProject.jar.archiveFile) {
+        into "."
+    }
+    from(forgeProject.configurations.runtimeClasspath) {
+        into "."
+        include "**/*.jar"
+        exclude { f ->
+            def n = f.name
+            def p = String.valueOf(f)
+            // Skip our own mod (already copied)
+            (n.startsWith("hexcasting-") && n.contains("neoforge")) ||
+                p.contains("Common") ||
+                // Skip game/bootstrap (Minecraft, NeoForge, LWJGL, Netty, etc.)
+                n.startsWith("minecraft-") ||
+                n.startsWith("neoforge-") ||
+                n.contains("merged") ||
+                p.contains("net.minecraft") ||
+                p.contains("net.neoforged") ||
+                n.startsWith("lwjgl") ||
+                n.startsWith("netty-") ||
+                n.startsWith("log4j-") ||
+                n.startsWith("gson-") ||
+                n.startsWith("guava-") ||
+                n.startsWith("commons-") ||
+                n.startsWith("asm") ||
+                n.startsWith("fastutil-") ||
+                n.startsWith("datafixerupper-") ||
+                n.startsWith("icu4j-") ||
+                n.startsWith("authlib-") ||
+                n.startsWith("brigadier-") ||
+                n.startsWith("jna-") ||
+                n.startsWith("sponge-mixin") ||
+                (n.startsWith("kotlin-") && !n.startsWith("kotlinforforge")) ||
+                n.startsWith("kotlinx-") ||
+                n.contains("slf4j") ||
+                n.contains("jline-") ||
+                n.startsWith("httpcore") ||
+                n.startsWith("httpclient") ||
+                n.startsWith("joml-") ||
+                n.startsWith("core-") ||
+                n.startsWith("toml-") ||
+                n.startsWith("securejarhandler") ||
+                n.startsWith("modlauncher") ||
+                n.startsWith("bootstraplauncher") ||
+                n.startsWith("blocklist") ||
+                n.startsWith("antlr4-") ||
+                n.startsWith("annotations-") ||
+                n.startsWith("checker-qual") ||
+                n.startsWith("error_prone") ||
+                n.startsWith("failureaccess") ||
+                n.startsWith("listenablefuture") ||
+                n.startsWith("jsr305") ||
+                n.startsWith("j2objc") ||
+                n.startsWith("maven-artifact") ||
+                n.startsWith("nashorn-") ||
+                n.startsWith("noexception") ||
+                n.startsWith("oshi-") ||
+                n.startsWith("plexus-") ||
+                n.startsWith("patchy-") ||
+                n.startsWith("terminalconsoleappender") ||
+                n.startsWith("text2speech") ||
+                n.startsWith("typetools") ||
+                n.startsWith("logging-")
+        }
+    }
+
+    into "modpack"
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    doLast {
+        def dir = file("modpack")
+        logger.lifecycle("Modpack JARs written to: ${dir.absolutePath}")
+    }
+}
+
+// Build, empty mods/, and fill it with the mod + all dependencies for server use
+tasks.register("installMods", Copy) {
+    group = "distribution"
+    description = "Build mod + deps, clear mods/, and copy everything needed for server into mods/"
+    dependsOn "collectModpack"
+
+    def modsDir = file("modpack")
+    from(modsDir) {
+        include "**/*.jar"
+    }
+    into "mods"
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    doFirst {
+        def target = file("mods")
+        if (target.exists()) {
+            target.listFiles()?.each { it.delete() }
+            logger.lifecycle("Emptied mods/")
+        }
+        target.mkdirs()
+    }
+    doLast {
+        logger.lifecycle("Server mods installed to: ${file('mods').absolutePath}")
+    }
+}

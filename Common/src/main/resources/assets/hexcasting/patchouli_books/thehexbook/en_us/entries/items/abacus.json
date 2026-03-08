@@ -3,7 +3,6 @@
   "category": "hexcasting:items",
   "icon": "hexcasting:abacus",
   "sortnum": 2,
-  "advancement": "hexcasting:root",
   "pages": [
     {
       "type": "patchouli:text",

@@ -2,7 +2,6 @@
   "name": "hexcasting.entry.impetus",
   "category": "hexcasting:greatwork",
   "icon": "hexcasting:impetus/rightclick",
-  "advancement": "hexcasting:enlightenment",
   "entry_color": "54398a",
   "sortnum": 2,
   "pages": [

@@ -79,7 +79,7 @@ public class BlockRedstoneDirectrix extends BlockCircleComponent {
         boolean pIsMoving) {
         super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
 
-        if (!pLevel.isClientSide) {
+        if (!pLevel.isClientSide()) {
             boolean currentlyPowered = pState.getValue(REDSTONE_POWERED);
             if (currentlyPowered != pLevel.hasNeighborSignal(pPos)) {
                 pLevel.setBlock(pPos, pState.setValue(REDSTONE_POWERED, !currentlyPowered), 2);

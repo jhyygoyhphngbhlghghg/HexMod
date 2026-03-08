@@ -3,7 +3,6 @@
   "icon": "hexcasting:ancient_scroll_paper",
   "category": "hexcasting:items",
   "sortnum": 10,
-  "advancement": "hexcasting:root",
   "pages": [
     {
       "type": "patchouli:text",

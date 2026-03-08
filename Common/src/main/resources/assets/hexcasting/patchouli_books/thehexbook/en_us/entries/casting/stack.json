@@ -3,7 +3,6 @@
   "category": "hexcasting:casting",
   "icon": "minecraft:piston",
   "sortnum": 0,
-  "advancement": "hexcasting:root",
   "pages": [
     {
       "type": "patchouli:text",

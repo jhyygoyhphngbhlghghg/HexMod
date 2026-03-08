@@ -30,9 +30,9 @@ class MishapNoSpellCircle : Mishap() {
         val caster = env.castingEntity as? ServerPlayer
         if (caster != null) {
             // FIXME: handle null caster case
-            dropAll(caster, caster.inventory.items)
-            dropAll(caster, caster.inventory.offhand)
-            dropAll(caster, caster.inventory.armor) {
+            dropAll(caster, caster.getInventory().items)
+            dropAll(caster, caster.getInventory().offhand)
+            dropAll(caster, caster.getInventory().armor) {
                 !EnchantmentHelper.hasTag(it, EnchantmentTags.CURSE)
             }
         }

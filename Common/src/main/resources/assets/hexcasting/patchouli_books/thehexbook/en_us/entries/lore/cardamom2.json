@@ -2,7 +2,6 @@
   "name": "hexcasting.entry.lore.cardamom2",
   "icon": "hexcasting:lore_fragment",
   "category": "hexcasting:lore",
-  "advancement": "hexcasting:lore/cardamom2",
   "sortnum": 1,
   "pages": [
     "hexcasting.page.lore.cardamom2.1",

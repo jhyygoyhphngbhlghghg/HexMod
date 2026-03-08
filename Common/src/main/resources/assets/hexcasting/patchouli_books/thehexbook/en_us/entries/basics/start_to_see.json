@@ -3,7 +3,6 @@
   "category": "hexcasting:basics",
   "icon": "minecraft:textures/mob_effect/blindness.png",
   "sortnum": 1,
-  "advancement": "hexcasting:opened_eyes",
   "pages": [
     {
       "type": "patchouli:text",

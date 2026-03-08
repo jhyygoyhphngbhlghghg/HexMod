@@ -3,8 +3,7 @@
     "category": "hexcasting:items",
     "icon": "minecraft:potion[potion_contents={potion:\"hexcasting:enlarge_grid\"}]",
     "sortnum": 8,
-    "advancement": "hexcasting:root",
-    "read_by_default": true,
+      "read_by_default": true,
     "pages": [
       {
         "type": "patchouli:text",

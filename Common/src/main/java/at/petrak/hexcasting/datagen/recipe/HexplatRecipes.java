@@ -571,7 +571,7 @@ public class HexplatRecipes extends PaucalRecipeProvider {
     }
 
     private void staffRecipe(Consumer<FinishedRecipe> recipes, ItemStaff staff, Ingredient plank) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, staff)
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, staff, 1)
             .define('W', plank)
             .define('S', Items.STICK)
             .define('A', HexItems.CHARGED_AMETHYST)
