@@ -52,3 +52,7 @@ do a very good job.) If you find you need something not in there yell at me on D
 ## Contributing
 
 Contributions are welcome via pull requests on GitHub. Please [link your PR](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue) to any issues that it fixes. Note that if your PR makes many unrelated changes, we may ask you to split it up into several smaller PRs to make it simpler to review. Also, feel free to update the `[UNRELEASED]` section in [CHANGELOG.md](./CHANGELOG.md) to document the changes in your PR (in a human-readable and concise manner, not just copying the commit messages).
+
+softrad's comment: this port is fully working, yall can use stuff from it if you want, even tho i was banned. not that i care. hmpfh. (might port it to 1.21.11 but just because i wanna play it with my friends and not for yall)
+
+![Hmph Hmph Anime GIF](https://media1.tenor.com/m/3kvIVPYgTE8AAAAd/hmph-hmph-anime.gif)
